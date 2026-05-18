@@ -1,16 +1,14 @@
 FROM php:8.2-apache
 
-RUN apt-get update && apt-get install -y \
-    libzip-dev zip unzip \
-    libpng-dev libjpeg-dev libfreetype6-dev libwebp-dev \
-    libonig-dev libxml2-dev libcurl4-openssl-dev \
-    libicu-dev libsodium-dev libxslt-dev \
-    curl ghostscript \
-    && docker-php-ext-configure gd --with-freetype --with-jpeg --with-webp \
-    && docker-php-ext-install -j$(nproc) \
-        pdo_mysql mysqli mbstring gd zip curl opcache \
-        bcmath intl soap exif sodium xsl \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+ADD --chmod=0755 https://github.com/mlocati/docker-php-extension-installer/releases/latest/download/install-php-extensions /usr/local/bin/
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    unzip curl \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN install-php-extensions \
+    pdo_mysql mysqli mbstring gd zip curl opcache \
+    bcmath intl soap exif sodium xsl
 
 RUN a2enmod rewrite headers expires
 
