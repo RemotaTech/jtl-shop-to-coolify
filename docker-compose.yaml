@@ -15,6 +15,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     healthcheck:
       test: ["CMD-SHELL", "curl -fsS -o /dev/null -w '%{http_code}' http://localhost/ | grep -qE '^(200|301|302|500)$'"]
       interval: 30s
@@ -25,6 +27,20 @@ services:
   db:
     image: mariadb:10.11
     restart: unless-stopped
+    command:
+      - --innodb-buffer-pool-size=512M
+      - --innodb-log-file-size=128M
+      - --innodb-flush-log-at-trx-commit=2
+      - --innodb-flush-method=O_DIRECT
+      - --innodb-io-capacity=2000
+      - --max-connections=200
+      - --table-open-cache=4000
+      - --tmp-table-size=64M
+      - --max-heap-table-size=64M
+      - --query-cache-type=0
+      - --query-cache-size=0
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
     environment:
       MARIADB_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MARIADB_DATABASE: ${MYSQL_DATABASE}
@@ -37,6 +53,27 @@ services:
       interval: 10s
       timeout: 5s
       retries: 10
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command:
+      - redis-server
+      - --maxmemory
+      - 256mb
+      - --maxmemory-policy
+      - allkeys-lru
+      - --save
+      - "900 1"
+      - --appendonly
+      - "no"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   cron:
     build: .
@@ -51,6 +88,7 @@ services:
 
 volumes:
   db_data:
+  redis_data:
   shop_bilder:
   shop_files:
   shop_export:

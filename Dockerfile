@@ -9,7 +9,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN install-php-extensions \
     pdo_mysql mysqli mbstring gd zip curl opcache \
     bcmath intl soap exif sodium xsl \
-    imagick calendar
+    imagick calendar redis
 
 RUN a2enmod rewrite headers expires
 
