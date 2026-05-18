@@ -45,7 +45,11 @@ RUN set -eux; \
     find /var/www/html -type d -exec chmod 755 {} \;; \
     find /var/www/html -type f -exec chmod 644 {} \;
 
+COPY --chmod=0755 docker/entrypoint.sh /usr/local/bin/jtl-entrypoint.sh
+
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
     CMD curl -fsS http://localhost/ || exit 1
 
 EXPOSE 80
+
+CMD ["/usr/local/bin/jtl-entrypoint.sh"]

@@ -12,6 +12,7 @@ services:
       - shop_export:/var/www/html/export
       - shop_mediafiles:/var/www/html/mediafiles
       - shop_templates_c:/var/www/html/templates_c
+      - shop_persist:/persist
     depends_on:
       db:
         condition: service_healthy
@@ -94,3 +95,4 @@ volumes:
   shop_export:
   shop_mediafiles:
   shop_templates_c:
+  shop_persist:
