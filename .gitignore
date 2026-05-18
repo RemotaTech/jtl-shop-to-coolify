@@ -1,0 +1,6 @@
+.env
+.DS_Store
+.idea/
+.vscode/
+shop/install/
+shop/includes/config.JTL-Shop.ini.php

@@ -1,0 +1,58 @@
+services:
+  shop:
+    build: .
+    restart: unless-stopped
+    expose:
+      - "80"
+    environment:
+      - SERVICE_FQDN_SHOP_80
+    volumes:
+      - shop_bilder:/var/www/html/bilder
+      - shop_files:/var/www/html/files
+      - shop_export:/var/www/html/export
+      - shop_mediafiles:/var/www/html/mediafiles
+      - shop_templates_c:/var/www/html/templates_c
+    depends_on:
+      db:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://localhost/"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  db:
+    image: mariadb:10.11
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MARIADB_DATABASE: ${MYSQL_DATABASE}
+      MARIADB_USER: ${MYSQL_USER}
+      MARIADB_PASSWORD: ${MYSQL_PASSWORD}
+    volumes:
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  cron:
+    build: .
+    restart: unless-stopped
+    command: >
+      sh -c "while true; do
+        curl -fsS http://shop/jtl_cron.php || true;
+        sleep 300;
+      done"
+    depends_on:
+      - shop
+
+volumes:
+  db_data:
+  shop_bilder:
+  shop_files:
+  shop_export:
+  shop_mediafiles:
+  shop_templates_c:
