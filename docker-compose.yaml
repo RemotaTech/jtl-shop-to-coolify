@@ -6,6 +6,11 @@ services:
       - "80"
     environment:
       - SERVICE_FQDN_SHOP_80
+    labels:
+      - traefik.http.middlewares.shop-bodysize.buffering.maxRequestBodyBytes=536870912
+      - traefik.http.middlewares.shop-bodysize.buffering.memRequestBodyBytes=10485760
+      - traefik.http.middlewares.shop-bodysize.buffering.maxResponseBodyBytes=536870912
+      - traefik.http.routers.shop.middlewares=shop-bodysize@docker
     volumes:
       - shop_bilder:/var/www/html/bilder
       - shop_files:/var/www/html/files
