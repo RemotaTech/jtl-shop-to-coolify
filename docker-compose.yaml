@@ -11,6 +11,10 @@ services:
       - shop_files:/var/www/html/files
       - shop_export:/var/www/html/export
       - shop_mediafiles:/var/www/html/mediafiles
+
+      # Your custom JTL template from GitHub, cloned on the host server
+      - /data/jtl-shop/templates/zp-template:/var/www/html/templates/zp-template
+
       - shop_templates_c:/var/www/html/templates_c
       - shop_persist:/persist
     depends_on:
