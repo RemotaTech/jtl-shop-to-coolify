@@ -7,6 +7,21 @@ CONFIG_PERSIST=${PERSIST_DIR}/config.JTL-Shop.ini.php
 
 mkdir -p "$PERSIST_DIR"
 
+# Seed volume-mounted dirs from image snapshot if empty (first boot).
+# Empty named volume overlays image content -> must restore baked files.
+seed_dir() {
+    target="$1"
+    seed="$2"
+    if [ -d "$seed" ] && [ -z "$(ls -A "$target" 2>/dev/null)" ]; then
+        echo "[entrypoint] seeding $target from image snapshot"
+        cp -a "$seed/." "$target/"
+        chown -R www-data:www-data "$target"
+    fi
+}
+
+seed_dir /var/www/html/templates /opt/jtl-seed/templates
+seed_dir /var/www/html/plugins   /opt/jtl-seed/plugins
+
 if [ -f "$CONFIG_PERSIST" ]; then
     echo "[entrypoint] restoring config.JTL-Shop.ini.php from /persist"
     cp "$CONFIG_PERSIST" "$CONFIG_SRC"

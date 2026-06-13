@@ -18,6 +18,7 @@ services:
       - shop_mediafiles:/var/www/html/mediafiles
       - shop_templates_c:/var/www/html/templates_c
       - shop_templates:/var/www/html/templates
+      - shop_plugins:/var/www/html/plugins
       - shop_persist:/persist
     depends_on:
       db:
@@ -103,3 +104,4 @@ volumes:
   shop_templates_c:
   shop_persist:
   shop_templates:
+  shop_plugins:

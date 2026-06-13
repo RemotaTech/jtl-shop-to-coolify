@@ -43,7 +43,10 @@ RUN set -eux; \
     find /var/www/html -mindepth 1 -maxdepth 1 -name '.gitkeep' -delete; \
     chown -R www-data:www-data /var/www/html; \
     find /var/www/html -type d -exec chmod 755 {} \;; \
-    find /var/www/html -type f -exec chmod 644 {} \;
+    find /var/www/html -type f -exec chmod 644 {} \;; \
+    mkdir -p /opt/jtl-seed; \
+    cp -a /var/www/html/templates /opt/jtl-seed/templates; \
+    cp -a /var/www/html/plugins /opt/jtl-seed/plugins
 
 COPY --chmod=0755 docker/entrypoint.sh /usr/local/bin/jtl-entrypoint.sh
 
