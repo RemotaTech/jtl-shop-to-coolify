@@ -46,7 +46,9 @@ RUN set -eux; \
     find /var/www/html -type f -exec chmod 644 {} \;; \
     mkdir -p /opt/jtl-seed; \
     cp -a /var/www/html/templates /opt/jtl-seed/templates; \
-    cp -a /var/www/html/plugins /opt/jtl-seed/plugins
+    cp -a /var/www/html/plugins /opt/jtl-seed/plugins; \
+    cp -a /var/www/html/downloads /opt/jtl-seed/downloads 2>/dev/null || mkdir -p /opt/jtl-seed/downloads; \
+    cp -a /var/www/html/uploads /opt/jtl-seed/uploads 2>/dev/null || mkdir -p /opt/jtl-seed/uploads
 
 COPY --chmod=0755 docker/entrypoint.sh /usr/local/bin/jtl-entrypoint.sh
 

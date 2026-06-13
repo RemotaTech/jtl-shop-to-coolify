@@ -12,15 +12,18 @@ mkdir -p "$PERSIST_DIR"
 seed_dir() {
     target="$1"
     seed="$2"
+    mkdir -p "$target"
     if [ -d "$seed" ] && [ -z "$(ls -A "$target" 2>/dev/null)" ]; then
         echo "[entrypoint] seeding $target from image snapshot"
         cp -a "$seed/." "$target/"
-        chown -R www-data:www-data "$target"
     fi
+    chown www-data:www-data "$target"
 }
 
 seed_dir /var/www/html/templates /opt/jtl-seed/templates
 seed_dir /var/www/html/plugins   /opt/jtl-seed/plugins
+seed_dir /var/www/html/downloads /opt/jtl-seed/downloads
+seed_dir /var/www/html/uploads   /opt/jtl-seed/uploads
 
 if [ -f "$CONFIG_PERSIST" ]; then
     echo "[entrypoint] restoring config.JTL-Shop.ini.php from /persist"
