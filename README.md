@@ -1,3 +1,4 @@
+![jtl-shop-to-coolify](jtl-shop-to-coolify.png)
 # jtl-shop-coolify
 
 JTL-Shop 5 on Coolify via Docker Compose. Drop ZIP, deploy.
