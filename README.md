@@ -4,6 +4,7 @@
 
 
 [![License: Non-Resale](https://img.shields.io/badge/License-Non--Resale-yellow.svg)](LICENSE)
+
 JTL-Shop 5 on Coolify via Docker Compose. Drop ZIP, deploy.
 
 ## What you do
