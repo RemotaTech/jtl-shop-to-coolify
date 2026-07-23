@@ -6,6 +6,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     unzip curl \
     && rm -rf /var/lib/apt/lists/*
 
+ENV IPE_PROCESSOR_COUNT=2
+
 RUN install-php-extensions \
     pdo_mysql mysqli mbstring gd zip curl opcache \
     bcmath intl soap exif sodium xsl \
