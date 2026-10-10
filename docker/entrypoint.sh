@@ -25,6 +25,37 @@ seed_dir /var/www/html/plugins   /opt/jtl-seed/plugins
 seed_dir /var/www/html/downloads /opt/jtl-seed/downloads
 seed_dir /var/www/html/uploads   /opt/jtl-seed/uploads
 
+# Refresh NOVA when image ships a different version than the volume.
+# seed_dir only fills empty volumes -> shop upgrades would keep old NOVA.
+# NOVA is vendor code: customizations belong in a child template.
+nova_version() {
+    sed -n 's:.*<Version>\(.*\)</Version>.*:\1:p' "$1/template.xml" 2>/dev/null | head -n1
+}
+
+refresh_nova() {
+    seed=/opt/jtl-seed/templates/NOVA
+    target=/var/www/html/templates/NOVA
+    [ -d "$seed" ] || return 0
+    new=$(nova_version "$seed")
+    old=$(nova_version "$target")
+    if [ -z "$new" ] || [ "$new" = "$old" ]; then
+        return 0
+    fi
+    echo "[entrypoint] updating NOVA template ${old:-none} -> $new"
+    if [ -d "$target" ]; then
+        backup="${PERSIST_DIR}/NOVA.bak-${old:-unknown}"
+        rm -rf "$backup"
+        mv "$target" "$backup"
+        echo "[entrypoint] old NOVA backed up to $backup"
+    fi
+    cp -a "$seed" "$target"
+    chown -R www-data:www-data "$target"
+    # Drop compiled Smarty output so pages rebuild against new NOVA.
+    find /var/www/html/templates_c -mindepth 1 -type f ! -name .htaccess -delete 2>/dev/null || true
+}
+
+refresh_nova
+
 if [ -f "$CONFIG_PERSIST" ]; then
     echo "[entrypoint] restoring config.JTL-Shop.ini.php from /persist"
     cp "$CONFIG_PERSIST" "$CONFIG_SRC"
