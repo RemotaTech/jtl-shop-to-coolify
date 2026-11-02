@@ -89,6 +89,10 @@ Volumes survive redeploy:
 2. Redeploy. Entrypoint compares NOVA `<Version>` in image vs `shop_templates` volume; on mismatch it swaps in new NOVA, backs old one up to `/persist/NOVA.bak-<old-version>`, and clears compiled Smarty files. Child templates untouched — keep customizations there, not in NOVA.
 3. Open admin backend → run database update when prompted, then clear cache (System → Cache).
 
+## Upgrading PHP
+
+Base image pinned to exact patch in `Dockerfile` (`FROM php:8.3.36-apache`) so redeploys can't reuse a stale cached PHP. On each PHP security release bump the patch number and redeploy. Verify in container terminal: `php -v`.
+
 ## Cron
 
 `cron` service hits `jtl_cron.php` every 5 min. Adjust interval in `docker-compose.yml` if needed.

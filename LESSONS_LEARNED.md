@@ -71,7 +71,7 @@ Running log of gotchas, root causes, and fixes from production deploys.
 - Install wizard 500s with: `Composer dependencies require a PHP version ">= 8.3.0". You are running 8.2.x`.
 
 **Fix**
-- `FROM php:8.3-apache` in Dockerfile. Bump again when JTL bumps requirement.
+- PHP 8.3 base image in Dockerfile (now pinned to exact patch, see #10). Bump again when JTL bumps requirement.
 
 ---
 
@@ -139,6 +139,23 @@ Running log of gotchas, root causes, and fixes from production deploys.
   - traefik.http.middlewares.shop-bodysize.buffering.maxRequestBodyBytes=536870912
   - traefik.http.routers.shop.middlewares=shop-bodysize@docker
   ```
+
+---
+
+## 10. Floating `php:8.3-apache` tag can keep a vulnerable PHP after redeploy
+
+**Symptom**
+- Oct 2026 "PHP2Shell" (CVE-2026-109618/109619, unauthenticated RCE, all PHP up to 8.3.35 / 8.4.26 / 8.5.11). Fixed in PHP 8.3.36 / 8.4.27 / 8.5.12 on 21 Oct 2026.
+
+**Root cause**
+- Docker reuses a cached `php:8.3-apache` base image unless the build pulls. Redeploy alone does not guarantee the patched PHP.
+
+**Fix**
+- Pin exact patch: `FROM php:8.3.36-apache`. Bump the patch on every PHP security release.
+- `session.upload_progress.enabled=0` in `docker/php/jtl.ini` — PHP's interim mitigation for CVE-2026-115560 (no fix release yet). Remove once a fixed PHP ships and is pinned.
+
+**Prevention**
+- After deploy, check from container terminal: `php -v`.
 
 ---
 
