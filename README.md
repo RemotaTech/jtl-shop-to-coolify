@@ -71,7 +71,7 @@ Visit `https://<your-domain>/install`:
 - DB name / user / password: from `.env`
 - Grants needed: SELECT, CREATE, ALTER, INSERT, UPDATE, DELETE, INDEX, DROP
 
-After install: delete `/install` directory inside container (or via Coolify file manager) — JTL security requirement.
+After install: JTL post-install hardening runs automatically via `jtl-post-install` ([docker/post-install.sh](docker/post-install.sh)) — deletes `/install` and makes `includes/config.JTL-Shop.ini.php` read-only for PHP (`root:www-data 0640`). Runs on every boot once config defines `BLOWFISH_KEY` (image re-adds `/install` each build), and 10 min after a fresh install. Run by hand anytime from container terminal: `jtl-post-install`.
 
 ## Persistent data
 

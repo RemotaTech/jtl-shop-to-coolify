@@ -67,6 +67,16 @@ if [ -f "$CONFIG_SRC" ] && [ ! -f "$CONFIG_PERSIST" ]; then
     cp "$CONFIG_SRC" "$CONFIG_PERSIST"
 fi
 
+# Image re-adds install/ and restore above re-chowns config on every boot
+# -> re-apply JTL post-install hardening. No-op until shop is installed.
+INSTALL_DIR=/var/www/html/install
+
+is_installed() {
+    [ -f "$CONFIG_SRC" ] && grep -q "BLOWFISH_KEY" "$CONFIG_SRC"
+}
+
+jtl-post-install || echo "[entrypoint] post-install hardening failed"
+
 (
     while true; do
         sleep 60
@@ -75,6 +85,11 @@ fi
                 cp "$CONFIG_SRC" "$CONFIG_PERSIST"
                 echo "[entrypoint] config.JTL-Shop.ini.php changed, synced to /persist"
             fi
+        fi
+        # Fresh install: wait 10 min after config is written so wizard can
+        # finish (optional demo data step), then drop install/.
+        if [ -d "$INSTALL_DIR" ] && is_installed && [ -n "$(find "$CONFIG_SRC" -mmin +10)" ]; then
+            jtl-post-install || echo "[entrypoint] post-install hardening failed"
         fi
     done
 ) &

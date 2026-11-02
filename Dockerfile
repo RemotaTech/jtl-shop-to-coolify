@@ -53,6 +53,7 @@ RUN set -eux; \
     cp -a /var/www/html/uploads /opt/jtl-seed/uploads 2>/dev/null || mkdir -p /opt/jtl-seed/uploads
 
 COPY --chmod=0755 docker/entrypoint.sh /usr/local/bin/jtl-entrypoint.sh
+COPY --chmod=0755 docker/post-install.sh /usr/local/bin/jtl-post-install
 
 HEALTHCHECK --interval=30s --timeout=10s --retries=3 \
     CMD curl -fsS http://localhost/ || exit 1
